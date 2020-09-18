@@ -1,4 +1,4 @@
-const db = require('../database/connection');
+const db = require('../database/connections');
 
 module.exports = {
     add, 
@@ -12,22 +12,14 @@ function find() {
 };
 
 function findBy(filter) {
-    return db('users as u')
-        .where(filter)
-        .orderBy('u.id')
-        .join('roles as r', 'r.id', 'u.department')
-        .select('u.id', 'u.username', 'u.password', 'r.name as department');
-}
+    return db("users").where(filter).orderBy("id");
+}; 
 
-async function add(user) {
-    try {
-        const [id] = await db("users").insert(user, "id");
-
-        return findById(id);
-    } catch (error) {
-        throw error; 
-    }
-}
+function add(user) {
+    return db("users").insert(user).then(info => {
+        return findById(info[0]); 
+     })
+ }
 
 function findById(id) {
     return db('users').where({ id }).first();
